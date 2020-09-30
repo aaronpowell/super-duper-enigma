@@ -19,7 +19,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "emulator": "npx swa --app-uri=http://localhost:3000 --api-uri=http://localhost:7071"
   },
   "eslintConfig": {
     "extends": "react-app"
