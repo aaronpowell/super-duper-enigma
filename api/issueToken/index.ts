@@ -12,6 +12,12 @@ type ClientPrincipal = {
   userRoles: string[];
 };
 
+type TokenResponse = {
+  token: string;
+  expiresOn: Date;
+  communicationUserId: string;
+};
+
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
@@ -39,7 +45,7 @@ const httpTrigger: AzureFunction = async function (
       token: tokenResponse.token,
       expiresOn: tokenResponse.expiresOn,
       communicationUserId: user.communicationUserId,
-    },
+    } as TokenResponse,
   };
 };
 

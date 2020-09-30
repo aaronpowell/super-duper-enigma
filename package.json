@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@azure/communication-calling": "^1.0.0-beta.1",
+    "@azure/communication-common": "^1.0.0-beta.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -21,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "emulator": "npx swa --app-uri=http://localhost:3000 --api-uri=http://localhost:7071"
+    "emulator": "swa --app-uri=http://localhost:3000 --api-uri=http://localhost:7071 --port 8080"
   },
   "eslintConfig": {
     "extends": "react-app"
