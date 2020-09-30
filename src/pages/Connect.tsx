@@ -1,5 +1,5 @@
 import { CallClient } from "@azure/communication-calling";
-import { AzureCommunicationUserCredential } from "@azure/communication-common";
+// import { AzureCommunicationUserCredential } from "@azure/communication-common";
 import React, { useEffect, useState } from "react";
 
 type TokenResponse = {
@@ -25,8 +25,8 @@ const ConnectPage = () => {
 
   useEffect(() => {
     const run = async (callClient: CallClient, token: string) => {
-      const tokenCredential = new AzureCommunicationUserCredential(token);
-      const callAgent = await callClient.createCallAgent(tokenCredential);
+      // const tokenCredential = new AzureCommunicationUserCredential(token);
+      // const callAgent = await callClient.createCallAgent(tokenCredential);
       const deviceManager = await callClient.getDeviceManager();
 
       console.log(deviceManager.getMicrophoneList());
@@ -38,6 +38,8 @@ const ConnectPage = () => {
       run(callClient, token);
     }
   }, [token]);
+
+  console.log(client);
 
   return <h1>Connect</h1>;
 };
