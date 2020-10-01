@@ -1,5 +1,11 @@
-import { CallClient } from "@azure/communication-calling";
-// import { AzureCommunicationUserCredential } from "@azure/communication-common";
+import {
+  AudioDeviceInfo,
+  CallAgent,
+  CallClient,
+  DeviceManager,
+  VideoDeviceInfo,
+} from "@azure/communication-calling";
+import { AzureCommunicationUserCredential } from "@azure/communication-common";
 import React, { useEffect, useState } from "react";
 
 type TokenResponse = {
@@ -11,6 +17,10 @@ type TokenResponse = {
 const ConnectPage = () => {
   const [token, setToken] = useState("");
   const [client, setClient] = useState<CallClient>();
+  const [, setCallAgent] = useState<CallAgent>();
+  const [, setDeviceManager] = useState<DeviceManager>();
+  const [, setCameraList] = useState<VideoDeviceInfo[]>();
+  const [, setMicList] = useState<AudioDeviceInfo[]>();
 
   useEffect(() => {
     const run = async () => {
@@ -25,11 +35,28 @@ const ConnectPage = () => {
 
   useEffect(() => {
     const run = async (callClient: CallClient, token: string) => {
-      // const tokenCredential = new AzureCommunicationUserCredential(token);
-      // const callAgent = await callClient.createCallAgent(tokenCredential);
-      const deviceManager = await callClient.getDeviceManager();
+      const tokenCredential = new AzureCommunicationUserCredential(token);
+      let callAgent: CallAgent | undefined = undefined;
+      try {
+        callAgent = await callClient.createCallAgent(tokenCredential);
+        const deviceManager = await callClient.getDeviceManager();
+        const result = await deviceManager.askDevicePermission(true, true);
 
-      console.log(deviceManager.getMicrophoneList());
+        setCallAgent(callAgent);
+        setDeviceManager(deviceManager);
+
+        if (result.audio) {
+          setMicList(deviceManager.getMicrophoneList());
+        }
+
+        if (result.video) {
+          setCameraList(deviceManager.getCameraList());
+        }
+      } catch {
+        if (callAgent) {
+          callAgent.dispose();
+        }
+      }
     };
 
     if (token) {
