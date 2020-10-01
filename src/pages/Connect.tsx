@@ -3,10 +3,12 @@ import {
   CallAgent,
   CallClient,
   DeviceManager,
+  LocalVideoStream,
+  Renderer,
   VideoDeviceInfo,
 } from "@azure/communication-calling";
 import { AzureCommunicationUserCredential } from "@azure/communication-common";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type TokenResponse = {
   token: string;
@@ -16,11 +18,12 @@ type TokenResponse = {
 
 const ConnectPage = () => {
   const [token, setToken] = useState("");
-  const [client, setClient] = useState<CallClient>();
+  const [, setClient] = useState<CallClient>();
   const [, setCallAgent] = useState<CallAgent>();
   const [, setDeviceManager] = useState<DeviceManager>();
-  const [, setCameraList] = useState<VideoDeviceInfo[]>();
+  const [cameraList, setCameraList] = useState<VideoDeviceInfo[]>();
   const [, setMicList] = useState<AudioDeviceInfo[]>();
+  const [currentCamera, setCurrentCamera] = useState<VideoDeviceInfo>();
 
   useEffect(() => {
     const run = async () => {
@@ -66,9 +69,42 @@ const ConnectPage = () => {
     }
   }, [token]);
 
-  console.log(client);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (currentCamera && ref.current) {
+      const vidStream = new LocalVideoStream(currentCamera);
+      const renderer = new Renderer(vidStream);
+      renderer.createView().then((target) => {
+        ref.current!.appendChild(target.target);
+      });
+    }
+  }, [ref, currentCamera]);
 
-  return <h1>Connect</h1>;
+  return (
+    <div>
+      <h1>Connect</h1>
+      {cameraList && cameraList.length && (
+        <select
+          onChange={(e) =>
+            !e.target.value
+              ? setCurrentCamera(undefined)
+              : setCurrentCamera(
+                  cameraList.find((item) => item.id === e.target.value)
+                )
+          }
+        >
+          <option value="">Select a camera...</option>
+          {cameraList.map((item) => (
+            <option value={item.id} key={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+      )}
+
+      {<div ref={ref}></div>}
+    </div>
+  );
 };
 
 export default ConnectPage;
