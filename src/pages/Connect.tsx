@@ -92,6 +92,14 @@ const ConnectPage = () => {
     }
   }, [currentCamera, vidStream, ref]);
 
+  useEffect(() => {
+    return () => {
+      if (renderer) {
+        renderer.dispose();
+      }
+    };
+  }, [renderer]);
+
   return (
     <div>
       <h1>Connect</h1>
