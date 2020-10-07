@@ -8,6 +8,7 @@ import {
   VideoDeviceInfo,
 } from "@azure/communication-calling";
 import { AzureCommunicationUserCredential } from "@azure/communication-common";
+import { render } from "@testing-library/react";
 import React, { useEffect, useRef, useState } from "react";
 
 type TokenResponse = {
@@ -24,6 +25,8 @@ const ConnectPage = () => {
   const [cameraList, setCameraList] = useState<VideoDeviceInfo[]>();
   const [, setMicList] = useState<AudioDeviceInfo[]>();
   const [currentCamera, setCurrentCamera] = useState<VideoDeviceInfo>();
+  const [vidStream, setVidStream] = useState<LocalVideoStream>();
+  const [renderer, setRenderer] = useState<Renderer>();
 
   useEffect(() => {
     const run = async () => {
@@ -70,15 +73,24 @@ const ConnectPage = () => {
   }, [token]);
 
   const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (currentCamera && ref.current) {
-      const vidStream = new LocalVideoStream(currentCamera);
-      const renderer = new Renderer(vidStream);
-      renderer.createView().then((target) => {
-        ref.current!.appendChild(target.target);
+    if (currentCamera && !vidStream) {
+      const lvs = new LocalVideoStream(currentCamera);
+      setVidStream(lvs);
+      const renderer = new Renderer(lvs);
+      setRenderer(renderer);
+      renderer.createView().then(({ target }) => {
+        ref.current!.appendChild(target);
       });
+    } else if (
+      currentCamera &&
+      vidStream &&
+      vidStream.getSource() !== currentCamera
+    ) {
+      vidStream.switchSource(currentCamera);
     }
-  }, [ref, currentCamera]);
+  }, [currentCamera, vidStream, ref]);
 
   return (
     <div>
