@@ -8,7 +8,6 @@ import {
   VideoDeviceInfo,
 } from "@azure/communication-calling";
 import { AzureCommunicationUserCredential } from "@azure/communication-common";
-import { render } from "@testing-library/react";
 import React, { useEffect, useRef, useState } from "react";
 
 type TokenResponse = {
