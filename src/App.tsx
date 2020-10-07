@@ -6,6 +6,7 @@ import LoginPage from "./pages/Login";
 import ConnectPage from "./pages/Connect";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthenticationContextProvider } from "./AuthenticationContext";
+import { CallingContextProvider } from "./hooks/useCallingContext";
 
 function App() {
   return (
@@ -15,9 +16,11 @@ function App() {
           <Switch>
             <Route exact path="/" component={HomePage} />
             <Route path="/login" component={LoginPage} />
-            <ProtectedRoute path="/connect">
-              <ConnectPage />
-            </ProtectedRoute>
+            <CallingContextProvider>
+              <ProtectedRoute path="/connect">
+                <ConnectPage />
+              </ProtectedRoute>
+            </CallingContextProvider>
           </Switch>
         </Router>
       </AuthenticationContextProvider>

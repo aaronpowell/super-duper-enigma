@@ -1,5 +1,5 @@
 import {
-    AudioDeviceInfo,
+  AudioDeviceInfo,
   LocalVideoStream,
   Renderer,
   VideoDeviceInfo,
@@ -40,7 +40,7 @@ const useUserCallSettings = () => {
     };
   }, [renderer]);
 
-  return { vidRef, setCurrentCamera, setCurrentMic };
+  return { vidRef, setCurrentCamera, setCurrentMic, currentCamera, currentMic };
 };
 
 export default useUserCallSettings;
