@@ -1,12 +1,14 @@
 import {
+    AudioDeviceInfo,
   LocalVideoStream,
   Renderer,
   VideoDeviceInfo,
 } from "@azure/communication-calling";
 import { useState, useEffect, useRef } from "react";
 
-const useCameraFeed = () => {
+const useUserCallSettings = () => {
   const [currentCamera, setCurrentCamera] = useState<VideoDeviceInfo>();
+  const [currentMic, setCurrentMic] = useState<AudioDeviceInfo>();
   const [vidStream, setVidStream] = useState<LocalVideoStream>();
   const [renderer, setRenderer] = useState<Renderer>();
 
@@ -38,7 +40,7 @@ const useCameraFeed = () => {
     };
   }, [renderer]);
 
-  return { vidRef, setCurrentCamera };
+  return { vidRef, setCurrentCamera, setCurrentMic };
 };
 
-export default useCameraFeed;
+export default useUserCallSettings;
