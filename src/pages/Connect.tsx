@@ -3,8 +3,14 @@ import { useCallingContext } from "../hooks/useCallingContext";
 import useUserCallSettings from "../hooks/useUserCallSettings";
 
 const ConnectPage = () => {
-  const { cameraList, micList } = useCallingContext();
-  const { vidRef, setCurrentCamera, setCurrentMic } = useUserCallSettings();
+  const { cameraList, micList, startCall } = useCallingContext();
+  const {
+    vidRef,
+    setCurrentCamera,
+    setCurrentMic,
+    currentCamera,
+    currentMic,
+  } = useUserCallSettings();
 
   return (
     <section>
@@ -49,9 +55,13 @@ const ConnectPage = () => {
           </select>
         )}
       </aside>
-      <section>
-        <button>Call</button>
-      </section>
+      {currentCamera && currentMic && (
+        <section>
+          <button onClick={() => startCall(currentCamera, currentMic)}>
+            Start Call
+          </button>
+        </section>
+      )}
     </section>
   );
 };
