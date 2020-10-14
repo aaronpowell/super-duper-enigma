@@ -7,48 +7,52 @@ const ConnectPage = () => {
   const { vidRef, setCurrentCamera, setCurrentMic } = useUserCallSettings();
 
   return (
-    <div>
+    <section>
       <h1>Connect</h1>
-      {<div ref={vidRef}></div>}
+      {<section ref={vidRef}></section>}
+      <aside>
+        {cameraList && cameraList.length && (
+          <select
+            onChange={(e) =>
+              !e.target.value
+                ? setCurrentCamera(undefined)
+                : setCurrentCamera(
+                    cameraList.find((item) => item.id === e.target.value)
+                  )
+            }
+          >
+            <option value="">Select a camera...</option>
+            {cameraList.map((item) => (
+              <option value={item.id} key={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        )}
 
-      {cameraList && cameraList.length && (
-        <select
-          onChange={(e) =>
-            !e.target.value
-              ? setCurrentCamera(undefined)
-              : setCurrentCamera(
-                  cameraList.find((item) => item.id === e.target.value)
-                )
-          }
-        >
-          <option value="">Select a camera...</option>
-          {cameraList.map((item) => (
-            <option value={item.id} key={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-      )}
-
-      {micList && micList.length && (
-        <select
-          onChange={(e) =>
-            !e.target.value
-              ? setCurrentMic(undefined)
-              : setCurrentMic(
-                  micList.find((item) => item.id === e.target.value)
-                )
-          }
-        >
-          <option value="">Select a mic...</option>
-          {micList.map((item) => (
-            <option value={item.id} key={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-      )}
-    </div>
+        {micList && micList.length && (
+          <select
+            onChange={(e) =>
+              !e.target.value
+                ? setCurrentMic(undefined)
+                : setCurrentMic(
+                    micList.find((item) => item.id === e.target.value)
+                  )
+            }
+          >
+            <option value="">Select a mic...</option>
+            {micList.map((item) => (
+              <option value={item.id} key={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        )}
+      </aside>
+      <section>
+        <button>Call</button>
+      </section>
+    </section>
   );
 };
 

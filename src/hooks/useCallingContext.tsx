@@ -8,15 +8,22 @@ import {
 import { AzureCommunicationUserCredential } from "@azure/communication-common";
 import React, { useState, useEffect, useContext } from "react";
 import useToken from "./useToken";
+import { v4 as uuid } from "uuid";
 
 export type CallingProps = {
   micList?: AudioDeviceInfo[];
   cameraList?: VideoDeviceInfo[];
-  callAgent?: CallAgent;
-  deviceManager?: DeviceManager;
+  startCall: (
+    currentCamera: VideoDeviceInfo,
+    currentMic: AudioDeviceInfo
+  ) => void;
 };
 
-const CallingContext = React.createContext<CallingProps>({});
+const CallingContext = React.createContext<CallingProps>({
+  startCall: (_: VideoDeviceInfo, __: AudioDeviceInfo) => {
+    throw new Error("Not implemented");
+  },
+});
 
 export const CallingContextProvider = (props: {
   children: React.ReactNode;
@@ -64,10 +71,15 @@ export const CallingContextProvider = (props: {
   return (
     <CallingContext.Provider
       value={{
-        callAgent,
-        deviceManager,
         cameraList,
         micList,
+        startCall: (currentCamera, currentMic) => {
+          if (deviceManager && callAgent) {
+            deviceManager.setMicrophone(currentMic);
+
+            callAgent.join({ groupId: uuid() });
+          }
+        },
       }}
     >
       {props.children}
