@@ -1,9 +1,11 @@
 import React from "react";
+import { useCallContext } from "../hooks/useCallContext";
 import { useCallingContext } from "../hooks/useCallingContext";
 import useUserCallSettings from "../hooks/useUserCallSettings";
 
 const ConnectPage = () => {
-  const { cameraList, micList, startCall } = useCallingContext();
+  const { cameraList, micList } = useCallingContext();
+  const { startCall } = useCallContext();
   const {
     vidRef,
     setCurrentCamera,
