@@ -1,18 +1,42 @@
-import React from "react";
+import { Renderer } from "@azure/communication-calling";
+import React, { useEffect, useRef, useState } from "react";
 import { useCallContext } from "../hooks/useCallContext";
 import { useCallingContext } from "../hooks/useCallingContext";
-import useUserCallSettings from "../hooks/useUserCallSettings";
+import { useUserCallSettingsContext } from "../hooks/useUserCallSettings";
 
 const ConnectPage = () => {
   const { cameraList, micList } = useCallingContext();
   const { startCall } = useCallContext();
   const {
-    vidRef,
     setCurrentCamera,
     setCurrentMic,
     currentCamera,
     currentMic,
-  } = useUserCallSettings();
+    videoStream,
+  } = useUserCallSettingsContext();
+
+  const vidRef = useRef<HTMLDivElement>(null);
+  const [renderer, setRenderer] = useState<Renderer>();
+
+  useEffect(() => {
+    if (videoStream && !renderer) {
+      setRenderer(new Renderer(videoStream));
+    }
+  }, [videoStream, renderer]);
+
+  useEffect(() => {
+    if (renderer) {
+      renderer.createView().then((view) => {
+        vidRef.current!.appendChild(view.target);
+      });
+    }
+
+    return () => {
+      if (renderer) {
+        renderer.dispose();
+      }
+    };
+  }, [renderer, vidRef]);
 
   return (
     <section>

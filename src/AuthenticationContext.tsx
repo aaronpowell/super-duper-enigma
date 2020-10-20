@@ -17,13 +17,19 @@ const AuthenticationContext = React.createContext<AuthenticationContextType>({
   clientPrincipal: undefined,
 });
 
+const storedPrincipal = localStorage.getItem("acs:principal");
+
 const AuthenticationContextProvider = ({
   children,
 }: {
   children: JSX.Element;
 }) => {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [clientPrincipal, setClientPrincipal] = useState<ClientPrincipal>();
+  const [authenticated, setAuthenticated] = useState(
+    storedPrincipal ? true : false
+  );
+  const [clientPrincipal, setClientPrincipal] = useState<ClientPrincipal>(
+    storedPrincipal ? JSON.parse(storedPrincipal) : undefined
+  );
 
   useEffect(() => {
     fetch("/.auth/me")
@@ -32,6 +38,10 @@ const AuthenticationContextProvider = ({
         if (json.clientPrincipal) {
           setAuthenticated(true);
           setClientPrincipal(json.clientPrincipal);
+          localStorage.setItem(
+            "acs:principal",
+            JSON.stringify(json.clientPrincipal)
+          );
         }
       });
   }, []);
