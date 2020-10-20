@@ -9,7 +9,7 @@ import { useCallingContext } from "./useCallingContext";
 import { v4 as uuid } from "uuid";
 import { useHistory } from "react-router-dom";
 
-type CallContextProps = {
+type ActiveCallContextProps = {
   startCall: (
     currentCamera: VideoDeviceInfo,
     currentMic: AudioDeviceInfo
@@ -17,19 +17,19 @@ type CallContextProps = {
   call?: Call;
 };
 
-const CallContext = React.createContext<CallContextProps>({
+const ActiveCallContext = React.createContext<ActiveCallContextProps>({
   startCall: (_: VideoDeviceInfo, __: AudioDeviceInfo) => {
     throw new Error("Not implemented");
   },
 });
 
-export const CallContextProvider = (props: { children: React.ReactNode }) => {
+export const ActiveCallContextProvider = (props: { children: React.ReactNode }) => {
   const history = useHistory();
   const { deviceManager, callAgent } = useCallingContext();
   const [call, setCall] = useState<Call>();
   //   const [, setLocalVideo] = useState();
   return (
-    <CallContext.Provider
+    <ActiveCallContext.Provider
       value={{
         call,
         startCall: (currentCamera, currentMic) => {
@@ -60,8 +60,8 @@ export const CallContextProvider = (props: { children: React.ReactNode }) => {
       }}
     >
       {props.children}
-    </CallContext.Provider>
+    </ActiveCallContext.Provider>
   );
 };
 
-export const useCallContext = () => useContext(CallContext);
+export const useActiveCallContext = () => useContext(ActiveCallContext);

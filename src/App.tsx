@@ -8,34 +8,36 @@ import CallPage from "./pages/Call";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthenticationContextProvider } from "./AuthenticationContext";
 import { CallingContextProvider } from "./hooks/useCallingContext";
-import { CallContextProvider } from "./hooks/useCallContext";
+import { ActiveCallContextProvider } from "./hooks/useActiveCallContext";
 import { UserCallSettingsContextProvider } from "./hooks/useUserCallSettings";
+import { loadTheme, initializeIcons } from "@fluentui/react";
+
+loadTheme({});
+initializeIcons();
 
 function App() {
   return (
-    <div>
-      <AuthenticationContextProvider>
-        <Router>
-          <Switch>
-            <Route exact path="/" component={HomePage} />
-            <Route path="/login" component={LoginPage} />
-            <CallingContextProvider>
-              <UserCallSettingsContextProvider>
-                <CallContextProvider>
-                  <ProtectedRoute path="/connect">
-                    <ConnectPage />
-                  </ProtectedRoute>
+    <AuthenticationContextProvider>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+          <Route path="/login" component={LoginPage} />
+          <CallingContextProvider>
+            <UserCallSettingsContextProvider>
+              <ActiveCallContextProvider>
+                <ProtectedRoute path="/connect">
+                  <ConnectPage />
+                </ProtectedRoute>
 
-                  <ProtectedRoute path="/call">
-                    <CallPage />
-                  </ProtectedRoute>
-                </CallContextProvider>
-              </UserCallSettingsContextProvider>
-            </CallingContextProvider>
-          </Switch>
-        </Router>
-      </AuthenticationContextProvider>
-    </div>
+                <ProtectedRoute path="/call">
+                  <CallPage />
+                </ProtectedRoute>
+              </ActiveCallContextProvider>
+            </UserCallSettingsContextProvider>
+          </CallingContextProvider>
+        </Switch>
+      </Router>
+    </AuthenticationContextProvider>
   );
 }
 

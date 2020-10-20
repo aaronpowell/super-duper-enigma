@@ -1,17 +1,25 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import { Provider } from "@fluentui/react-northstar";
+import { svgIconStyles } from "@fluentui/react-northstar/dist/es/themes/teams/components/SvgIcon/svgIconStyles";
+import { svgIconVariables } from "@fluentui/react-northstar/dist/es/themes/teams/components/SvgIcon/svgIconVariables";
+import * as siteVariables from "@fluentui/react-northstar/dist/es/themes/teams/siteVariables";
+
+const iconTheme = {
+  componentStyles: {
+    SvgIcon: svgIconStyles,
+  },
+  componentVariables: {
+    SvgIcon: svgIconVariables,
+  },
+  siteVariables,
+};
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Provider theme={iconTheme} className="wrapper">
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </Provider>,
+  document.getElementById("root")
 );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();

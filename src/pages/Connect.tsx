@@ -1,18 +1,32 @@
 import { Renderer } from "@azure/communication-calling";
+import {
+  Icon,
+  PrimaryButton,
+  Stack,
+  StackItem,
+  TextField,
+  Toggle,
+} from "@fluentui/react";
+import { VideoCameraEmphasisIcon } from "@fluentui/react-northstar";
 import React, { useEffect, useRef, useState } from "react";
-import { useCallContext } from "../hooks/useCallContext";
-import { useCallingContext } from "../hooks/useCallingContext";
+import CameraPicker from "../components/CameraPicker";
+import MicPicker from "../components/MicPicker";
+import { useActiveCallContext } from "../hooks/useActiveCallContext";
 import { useUserCallSettingsContext } from "../hooks/useUserCallSettings";
 
 const ConnectPage = () => {
-  const { cameraList, micList } = useCallingContext();
-  const { startCall } = useCallContext();
+  const { startCall } = useActiveCallContext();
   const {
     setCurrentCamera,
-    setCurrentMic,
+    setName,
     currentCamera,
     currentMic,
     videoStream,
+    name,
+    setCameraEnabled,
+    setMicEnabled,
+    cameraEnabled,
+    micEnabled,
   } = useUserCallSettingsContext();
 
   const vidRef = useRef<HTMLDivElement>(null);
@@ -39,56 +53,67 @@ const ConnectPage = () => {
   }, [renderer, vidRef]);
 
   return (
-    <section>
-      <h1>Connect</h1>
-      {<section ref={vidRef}></section>}
-      <aside>
-        {cameraList && cameraList.length && (
-          <select
-            onChange={(e) =>
-              !e.target.value
-                ? setCurrentCamera(undefined)
-                : setCurrentCamera(
-                    cameraList.find((item) => item.id === e.target.value)
-                  )
-            }
-          >
-            <option value="">Select a camera...</option>
-            {cameraList.map((item) => (
-              <option value={item.id} key={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        )}
+    <Stack tokens={{ childrenGap: 20 }}>
+      <h1>Create a new call</h1>
+      <Stack horizontal tokens={{ childrenGap: 10 }}>
+        <StackItem>
+          {!currentCamera && (
+            <Icon
+              iconName="Contact"
+              style={{ width: "20rem", height: "15rem", fontSize: "15rem" }}
+            />
+          )}
+          <section
+            ref={vidRef}
+            style={{
+              width: "20rem",
+              maxHeight: "15.9375rem",
+              transform: "rotateY(180deg)",
+              display: currentCamera ? "block" : "none",
+            }}
+          ></section>
+        </StackItem>
+        <StackItem>
+          <h2>Your Call Info</h2>
+          <TextField
+            label="Your Name"
+            value={name}
+            onChange={(_, value) => setName(value || "")}
+          />
+          <Toggle
+            label="Enable Camera"
+            onText="Yes"
+            offText="No"
+            onChange={(_, checked) => {
+              setCameraEnabled(checked || false);
+              setCurrentCamera(undefined);
+            }}
+            checked={cameraEnabled}
+          />
+          {cameraEnabled && <CameraPicker />}
 
-        {micList && micList.length && (
-          <select
-            onChange={(e) =>
-              !e.target.value
-                ? setCurrentMic(undefined)
-                : setCurrentMic(
-                    micList.find((item) => item.id === e.target.value)
-                  )
-            }
-          >
-            <option value="">Select a mic...</option>
-            {micList.map((item) => (
-              <option value={item.id} key={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        )}
-      </aside>
-      {currentCamera && currentMic && (
-        <section>
-          <button onClick={() => startCall(currentCamera, currentMic)}>
+          <Toggle
+            label="Enable Mic"
+            onText="Yes"
+            offText="No"
+            onChange={(_, checked) => setMicEnabled(checked || false)}
+            checked={micEnabled}
+          />
+          {micEnabled && <MicPicker />}
+        </StackItem>
+      </Stack>
+      <StackItem align="center">
+        {currentCamera && currentMic && (
+          <PrimaryButton onClick={() => startCall(currentCamera, currentMic)}>
+            <VideoCameraEmphasisIcon
+              size="medium"
+              style={{ paddingRight: "10px" }}
+            />
             Start Call
-          </button>
-        </section>
-      )}
-    </section>
+          </PrimaryButton>
+        )}
+      </StackItem>
+    </Stack>
   );
 };
 

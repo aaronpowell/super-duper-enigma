@@ -1,8 +1,8 @@
 import React from "react";
-import { useCallContext } from "../hooks/useCallContext";
+import { useActiveCallContext } from "../hooks/useActiveCallContext";
 
 const Call = () => {
-  const { call } = useCallContext();
+  const { call } = useActiveCallContext();
 
   if (!call) {
     return <h1>Loading...</h1>;

@@ -4,22 +4,32 @@ import {
   VideoDeviceInfo,
 } from "@azure/communication-calling";
 import React, { useState, useEffect, useContext, createContext } from "react";
+import { useAuthenticationContext } from "../AuthenticationContext";
+import { nie } from "../utils";
 
 export type UserCallSettingsContextType = {
   setCurrentCamera: (camera?: VideoDeviceInfo) => void;
   setCurrentMic: (mic?: AudioDeviceInfo) => void;
+  setName: (name: string) => void;
+  setCameraEnabled: (enabled: boolean) => void;
+  setMicEnabled: (enabled: boolean) => void;
   currentCamera?: VideoDeviceInfo;
   currentMic?: AudioDeviceInfo;
   videoStream?: LocalVideoStream;
+  name: string;
+  cameraEnabled: boolean;
+  micEnabled: boolean;
 };
 
 const UserCallSettingsContext = createContext<UserCallSettingsContextType>({
-  setCurrentCamera: (_) => {
-    throw Error("Not Implemented");
-  },
-  setCurrentMic: (_) => {
-    throw Error("Not Implemented");
-  },
+  setCurrentCamera: nie,
+  setCurrentMic: nie,
+  setName: nie,
+  setCameraEnabled: nie,
+  setMicEnabled: nie,
+  name: "",
+  cameraEnabled: false,
+  micEnabled: false,
 });
 
 export const UserCallSettingsContextProvider = (props: {
@@ -28,6 +38,16 @@ export const UserCallSettingsContextProvider = (props: {
   const [currentCamera, setCurrentCamera] = useState<VideoDeviceInfo>();
   const [currentMic, setCurrentMic] = useState<AudioDeviceInfo>();
   const [videoStream, setVidStream] = useState<LocalVideoStream>();
+  const { clientPrincipal } = useAuthenticationContext();
+  const [name, setName] = useState("");
+  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [micEnabled, setMicEnabled] = useState(true);
+
+  useEffect(() => {
+    if (clientPrincipal && !name) {
+      setName(clientPrincipal.userDetails);
+    }
+  }, [clientPrincipal, name]);
 
   useEffect(() => {
     if (currentCamera && !videoStream) {
@@ -50,6 +70,12 @@ export const UserCallSettingsContextProvider = (props: {
         currentCamera,
         currentMic,
         videoStream,
+        setName,
+        name,
+        setCameraEnabled,
+        cameraEnabled,
+        setMicEnabled,
+        micEnabled,
       }}
     >
       {props.children}
@@ -59,42 +85,3 @@ export const UserCallSettingsContextProvider = (props: {
 
 export const useUserCallSettingsContext = () =>
   useContext(UserCallSettingsContext);
-
-// const useUserCallSettings = () => {
-//   const [currentCamera, setCurrentCamera] = useState<VideoDeviceInfo>();
-//   const [currentMic, setCurrentMic] = useState<AudioDeviceInfo>();
-//   const [vidStream, setVidStream] = useState<LocalVideoStream>();
-//   const [renderer, setRenderer] = useState<Renderer>();
-
-//   const vidRef = useRef<HTMLDivElement>(null);
-
-//   useEffect(() => {
-//     if (currentCamera && !vidStream) {
-//       const lvs = new LocalVideoStream(currentCamera);
-//       setVidStream(lvs);
-//       const renderer = new Renderer(lvs);
-//       setRenderer(renderer);
-//       renderer.createView().then(({ target }) => {
-//         vidRef.current!.appendChild(target);
-//       });
-//     } else if (
-//       currentCamera &&
-//       vidStream &&
-//       vidStream.getSource() !== currentCamera
-//     ) {
-//       vidStream.switchSource(currentCamera);
-//     }
-//   }, [currentCamera, vidStream, vidRef]);
-
-//   useEffect(() => {
-//     return () => {
-//       if (renderer) {
-//         renderer.dispose();
-//       }
-//     };
-//   }, [renderer]);
-
-//   return { vidRef, setCurrentCamera, setCurrentMic, currentCamera, currentMic };
-// };
-
-// export default useUserCallSettings;
