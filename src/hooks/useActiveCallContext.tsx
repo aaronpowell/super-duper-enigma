@@ -1,46 +1,46 @@
-import {
-  AudioDeviceInfo,
-  Call,
-  LocalVideoStream,
-  VideoDeviceInfo,
-} from "@azure/communication-calling";
+import { Call, LocalVideoStream } from "@azure/communication-calling";
 import React, { useContext, useState } from "react";
 import { useCallingContext } from "./useCallingContext";
 import { v4 as uuid } from "uuid";
 import { useHistory } from "react-router-dom";
+import { useUserCallSettingsContext } from "./useUserCallSettings";
 
 type ActiveCallContextProps = {
-  startCall: (
-    currentCamera: VideoDeviceInfo,
-    currentMic: AudioDeviceInfo
-  ) => void;
+  startCall: () => void;
   call?: Call;
 };
 
 const ActiveCallContext = React.createContext<ActiveCallContextProps>({
-  startCall: (_: VideoDeviceInfo, __: AudioDeviceInfo) => {
+  startCall: () => {
     throw new Error("Not implemented");
   },
 });
 
-export const ActiveCallContextProvider = (props: { children: React.ReactNode }) => {
+export const ActiveCallContextProvider = (props: {
+  children: React.ReactNode;
+}) => {
   const history = useHistory();
   const { deviceManager, callAgent } = useCallingContext();
+  const { currentCamera, currentMic, name } = useUserCallSettingsContext();
   const [call, setCall] = useState<Call>();
   //   const [, setLocalVideo] = useState();
   return (
     <ActiveCallContext.Provider
       value={{
         call,
-        startCall: (currentCamera, currentMic) => {
+        startCall: () => {
           if (deviceManager && callAgent) {
-            deviceManager.setMicrophone(currentMic);
+            callAgent.updateDisplayName(name);
+            if (currentMic) deviceManager.setMicrophone(currentMic);
 
+            const groupId = uuid();
             const call = callAgent.join(
-              { groupId: uuid() },
+              { groupId },
               {
                 videoOptions: {
-                  localVideoStreams: [new LocalVideoStream(currentCamera)],
+                  localVideoStreams: currentCamera
+                    ? [new LocalVideoStream(currentCamera)]
+                    : [],
                 },
               }
             );
@@ -54,7 +54,7 @@ export const ActiveCallContextProvider = (props: { children: React.ReactNode }) 
               console.log("remoteParticipantsUpdated", e);
             });
 
-            history.push("/call");
+            history.push(`/call/${groupId}`);
           }
         },
       }}

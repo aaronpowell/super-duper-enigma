@@ -104,7 +104,7 @@ const ConnectPage = () => {
       </Stack>
       <StackItem align="center">
         {currentCamera && currentMic && (
-          <PrimaryButton onClick={() => startCall(currentCamera, currentMic)}>
+          <PrimaryButton onClick={() => startCall()}>
             <VideoCameraEmphasisIcon
               size="medium"
               style={{ paddingRight: "10px" }}

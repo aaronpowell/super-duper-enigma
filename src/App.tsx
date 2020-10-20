@@ -29,7 +29,7 @@ function App() {
                   <ConnectPage />
                 </ProtectedRoute>
 
-                <ProtectedRoute path="/call">
+                <ProtectedRoute path="/call/:groupId">
                   <CallPage />
                 </ProtectedRoute>
               </ActiveCallContextProvider>
