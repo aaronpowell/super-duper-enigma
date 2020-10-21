@@ -1,4 +1,8 @@
-import { Call, LocalVideoStream } from "@azure/communication-calling";
+import {
+  Call,
+  CallState,
+  LocalVideoStream,
+} from "@azure/communication-calling";
 import React, { useContext, useState } from "react";
 import { useCallingContext } from "./useCallingContext";
 import { v4 as uuid } from "uuid";
@@ -23,6 +27,7 @@ export const ActiveCallContextProvider = (props: {
   const { deviceManager, callAgent } = useCallingContext();
   const { currentCamera, currentMic, name } = useUserCallSettingsContext();
   const [call, setCall] = useState<Call>();
+  const [, setCallState] = useState<CallState>();
   //   const [, setLocalVideo] = useState();
   return (
     <ActiveCallContext.Provider
@@ -31,7 +36,9 @@ export const ActiveCallContextProvider = (props: {
         startCall: () => {
           if (deviceManager && callAgent) {
             callAgent.updateDisplayName(name);
-            if (currentMic) deviceManager.setMicrophone(currentMic);
+            if (currentMic) {
+              deviceManager.setMicrophone(currentMic);
+            }
 
             const groupId = uuid();
             const call = callAgent.join(
@@ -53,6 +60,8 @@ export const ActiveCallContextProvider = (props: {
             call.on("remoteParticipantsUpdated", (e) => {
               console.log("remoteParticipantsUpdated", e);
             });
+
+            call.on("callStateChanged", () => setCallState(call.state));
 
             history.push(`/call/${groupId}`);
           }
