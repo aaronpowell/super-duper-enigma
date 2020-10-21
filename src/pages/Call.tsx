@@ -1,17 +1,16 @@
-import { Spinner, Stack } from "@fluentui/react";
+import { Stack } from "@fluentui/react";
 import React from "react";
+import { useHistory, useParams } from "react-router-dom";
 import { useActiveCallContext } from "../hooks/useActiveCallContext";
 
 const Call = () => {
   const { call } = useActiveCallContext();
+  const history = useHistory();
+  const { groupId } = useParams<{ groupId: string }>();
 
   if (!call) {
-    return (
-      <Stack>
-        <h1>Your call is important to us, please stand by...</h1>
-        <Spinner />
-      </Stack>
-    );
+    history.push(`/join/${groupId}`);
+    return null;
   }
 
   return (

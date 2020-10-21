@@ -8,9 +8,11 @@ import { useCallingContext } from "./useCallingContext";
 import { v4 as uuid } from "uuid";
 import { useHistory } from "react-router-dom";
 import { useUserCallSettingsContext } from "./useUserCallSettings";
+import { nie } from "../utils";
 
 type ActiveCallContextProps = {
   startCall: () => void;
+  joinCall: (groupId: string) => void;
   call?: Call;
 };
 
@@ -18,6 +20,7 @@ const ActiveCallContext = React.createContext<ActiveCallContextProps>({
   startCall: () => {
     throw new Error("Not implemented");
   },
+  joinCall: nie,
 });
 
 export const ActiveCallContextProvider = (props: {
@@ -41,6 +44,38 @@ export const ActiveCallContextProvider = (props: {
             }
 
             const groupId = uuid();
+            const call = callAgent.join(
+              { groupId },
+              {
+                videoOptions: {
+                  localVideoStreams: currentCamera
+                    ? [new LocalVideoStream(currentCamera)]
+                    : [],
+                },
+              }
+            );
+
+            setCall(call);
+
+            call.on("localVideoStreamsUpdated", (e) => {
+              console.log(`localVideoStreamsUpdated`, e);
+            });
+            call.on("remoteParticipantsUpdated", (e) => {
+              console.log("remoteParticipantsUpdated", e);
+            });
+
+            call.on("callStateChanged", () => setCallState(call.state));
+
+            history.push(`/call/${groupId}`);
+          }
+        },
+        joinCall: (groupId) => {
+          if (deviceManager && callAgent) {
+            callAgent.updateDisplayName(name);
+            if (currentMic) {
+              deviceManager.setMicrophone(currentMic);
+            }
+
             const call = callAgent.join(
               { groupId },
               {

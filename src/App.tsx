@@ -11,6 +11,7 @@ import { CallingContextProvider } from "./hooks/useCallingContext";
 import { ActiveCallContextProvider } from "./hooks/useActiveCallContext";
 import { UserCallSettingsContextProvider } from "./hooks/useUserCallSettings";
 import { loadTheme, initializeIcons } from "@fluentui/react";
+import JoinCall from "./pages/JoinCall";
 
 loadTheme({});
 initializeIcons();
@@ -31,6 +32,10 @@ function App() {
 
                 <ProtectedRoute path="/call/:groupId">
                   <CallPage />
+                </ProtectedRoute>
+
+                <ProtectedRoute path={["/join/:groupId", "/join"]}>
+                  <JoinCall />
                 </ProtectedRoute>
               </ActiveCallContextProvider>
             </UserCallSettingsContextProvider>
