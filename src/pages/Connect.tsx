@@ -18,6 +18,7 @@ const ConnectPage = () => {
   const { startCall } = useActiveCallContext();
   const {
     setCurrentCamera,
+    setCurrentMic,
     setName,
     currentCamera,
     currentMic,
@@ -86,7 +87,9 @@ const ConnectPage = () => {
             offText="No"
             onChange={(_, checked) => {
               setCameraEnabled(checked || false);
-              setCurrentCamera(undefined);
+              if (!checked) {
+                setCurrentCamera(undefined);
+              }
             }}
             checked={cameraEnabled}
           />
@@ -96,7 +99,12 @@ const ConnectPage = () => {
             label="Enable Mic"
             onText="Yes"
             offText="No"
-            onChange={(_, checked) => setMicEnabled(checked || false)}
+            onChange={(_, checked) => {
+              setMicEnabled(checked || false);
+              if (!checked) {
+                setCurrentMic(undefined);
+              }
+            }}
             checked={micEnabled}
           />
           {micEnabled && <MicPicker />}
@@ -104,7 +112,7 @@ const ConnectPage = () => {
       </Stack>
       <StackItem align="center">
         {currentCamera && currentMic && (
-          <PrimaryButton onClick={() => startCall()}>
+          <PrimaryButton onClick={startCall}>
             <VideoCameraEmphasisIcon
               size="medium"
               style={{ paddingRight: "10px" }}
