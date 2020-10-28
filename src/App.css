@@ -2,3 +2,16 @@ body {
   margin: 0 auto;
   width: 1024px;
 }
+
+.video-display {
+  position: relative;
+}
+.video-display span {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  background-color: #c0ffee;
+  padding: 5px 20px 5px 10px;
+  border-radius: 0px 5px 0px 0px;
+  z-index: 1;
+}

@@ -3,6 +3,7 @@ import {
   CallState,
   LocalVideoStream,
   RemoteParticipant,
+  RemoteParticipantState,
 } from "@azure/communication-calling";
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useCallingContext } from "./useCallingContext";
@@ -51,8 +52,49 @@ export const ActiveCallContextProvider = (props: {
   );
 
   const remoteParticipantsUpdated = useCallback(
-    (streams: { added: RemoteParticipant[]; removed: RemoteParticipant[] }) => {
-      setRemoteParticipants(streams.added);
+    (incomingRemoteParticipants: {
+      added: RemoteParticipant[];
+      removed: RemoteParticipant[];
+    }) => {
+      for (const participant of incomingRemoteParticipants.added) {
+        participant.on("videoStreamsUpdated", (x) => {
+          console.log("videoStreamsUpdate", x);
+        });
+
+        participant.on("participantStateChanged", () => {
+          switch (participant.state) {
+            case "Connected":
+              console.log(
+                `participant ${participant.displayName} has connected`
+              );
+              setRemoteParticipants((remoteParticipants) => [
+                ...remoteParticipants,
+                participant,
+              ]);
+              break;
+
+            case "Disconnected":
+              console.log(
+                `participant ${participant.displayName} has disconnected`
+              );
+              setRemoteParticipants((remoteParticipants) => {
+                const index = remoteParticipants.indexOf(participant);
+                return remoteParticipants
+                  .slice(0, index)
+                  .concat(remoteParticipants.slice(index + 1));
+              });
+              break;
+          }
+        });
+
+        participant.on("isSpeakingChanged", () => {
+          console.log("isSpeakingChanged", participant);
+        });
+
+        participant.on("displayNameChanged", () => {
+          console.log(`new name: ${participant.displayName}`);
+        });
+      }
     },
     []
   );
