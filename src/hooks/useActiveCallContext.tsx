@@ -3,7 +3,6 @@ import {
   CallState,
   LocalVideoStream,
   RemoteParticipant,
-  RemoteParticipantState,
 } from "@azure/communication-calling";
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useCallingContext } from "./useCallingContext";

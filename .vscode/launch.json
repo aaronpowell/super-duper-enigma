@@ -13,6 +13,14 @@
       "request": "launch",
       "type": "node-terminal",
       "cwd": "${workspaceFolder}/api"
+    },
+    {
+      "type": "edge",
+      "request": "launch",
+      "version": "canary",
+      "name": "Launch Edge against localhost",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
     }
   ],
   "compounds": [
