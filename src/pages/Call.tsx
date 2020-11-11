@@ -1,35 +1,46 @@
 import {
   LocalVideoStream,
   RemoteVideoStream,
-  Renderer,
 } from "@azure/communication-calling";
+import {
+  CommunicationUser,
+  CallingApplication,
+  UnknownIdentifier,
+  PhoneNumber,
+  isCommunicationUser,
+  isCallingApplication,
+  isPhoneNumber,
+} from "@azure/communication-common";
 import { Stack, StackItem } from "@fluentui/react";
-import React, { useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import VideoDisplay from "../components/VideoDisplay";
 import { useActiveCallContext } from "../hooks/useActiveCallContext";
 import { useUserCallSettingsContext } from "../hooks/useUserCallSettings";
+import { mediaGalleryGridStyle, mediaGalleryStyle } from "../styling";
 
-const VideoDisplay = (props: {
+const getId = (
+  identifier:
+    | CommunicationUser
+    | CallingApplication
+    | UnknownIdentifier
+    | PhoneNumber
+): string => {
+  if (isCommunicationUser(identifier)) {
+    return identifier.communicationUserId;
+  } else if (isCallingApplication(identifier)) {
+    return identifier.callingApplicationId;
+  } else if (isPhoneNumber(identifier)) {
+    return identifier.phoneNumber;
+  } else {
+    return identifier.id;
+  }
+};
+
+type VideoParticipant = {
+  id: string;
   stream: LocalVideoStream | RemoteVideoStream;
-  name?: string;
-}) => {
-  const vidRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const renderer = new Renderer(props.stream);
-
-    renderer.createView().then((view) => {
-      if (vidRef.current) {
-        vidRef.current.appendChild(view.target);
-      }
-    });
-  }, [props.stream, props.name, vidRef]);
-
-  return (
-    <div className="video-display" ref={vidRef}>
-      <span>{props.name}</span>
-    </div>
-  );
+  name: string;
 };
 
 const Call = () => {
@@ -41,40 +52,79 @@ const Call = () => {
   const history = useHistory();
   const { groupId } = useParams<{ groupId: string }>();
   const { name } = useUserCallSettingsContext();
+  const [gridCol, setGridCol] = useState(1);
+  const [gridRow, setGridRow] = useState(1);
+
+  const calculateNumberOfRows = React.useCallback(
+    (participants: VideoParticipant[], gridCol: number) =>
+      Math.ceil((participants.length + 1) / gridCol),
+    []
+  );
+  const calculateNumberOfColumns = React.useCallback(
+    (participants: VideoParticipant[]) =>
+      participants && participants.length > 0
+        ? Math.ceil(Math.sqrt(participants.length + 1))
+        : 1,
+    []
+  );
 
   if (!call) {
     history.push(`/join/${groupId}`);
     return null;
   }
 
-  console.log("remoteParticipants", remoteParticipants);
+  const videoStreams: VideoParticipant[] = [
+    ...localVideoStreams.map((stream) => {
+      return {
+        id: stream.getSource().id,
+        stream,
+        name,
+      };
+    }),
+    ...remoteParticipants
+      .map((participant) => {
+        return participant.videoStreams
+          .filter((stream) => stream.isAvailable)
+          .map((stream) => {
+            return {
+              id: getId(participant.identifier),
+              stream,
+              name: participant.displayName || getId(participant.identifier),
+            };
+          });
+      })
+      .reduce((arr, streams) => [...arr, ...streams], []),
+  ];
+
+  const numberOfColumns = calculateNumberOfColumns(videoStreams);
+  if (numberOfColumns !== gridCol) setGridCol(numberOfColumns);
+  const numberOfRows = calculateNumberOfRows(videoStreams, gridCol);
+  if (numberOfRows !== gridRow) setGridRow(numberOfRows);
 
   return (
-    <Stack>
+    <Stack horizontalAlign="center" verticalAlign="center">
+      <StackItem>Header</StackItem>
       <StackItem>
-        <h2>This should be you</h2>
-        {localVideoStreams.map((stream) => (
-          <VideoDisplay
-            key={stream.getSource().id}
-            stream={stream}
-            name={name}
-          />
-        ))}
+        <Stack horizontal>
+          <StackItem grow>
+            <div
+              className={mediaGalleryGridStyle}
+              style={{
+                gridTemplateRows: `repeat(${gridRow}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${gridCol}, 1fr)`,
+              }}
+            >
+              {videoStreams.map(({ id, stream, name }) => {
+                return (
+                  <div key={id} className={mediaGalleryStyle}>
+                    <VideoDisplay stream={stream} name={name} />
+                  </div>
+                );
+              })}
+            </div>
+          </StackItem>
+        </Stack>
       </StackItem>
-      <Stack>
-        <h2>Here's your friends</h2>
-        {remoteParticipants.map((participant) =>
-          participant.videoStreams
-            .filter((stream) => stream.isAvailable)
-            .map((stream) => (
-              <VideoDisplay
-                key={stream.id}
-                stream={stream}
-                name={participant.displayName}
-              />
-            ))
-        )}
-      </Stack>
     </Stack>
   );
 };
