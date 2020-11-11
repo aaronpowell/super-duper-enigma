@@ -14,6 +14,7 @@ import {
 import { Stack, StackItem } from "@fluentui/react";
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import CallControls from "../components/CallControls";
 import VideoDisplay from "../components/VideoDisplay";
 import { useActiveCallContext } from "../hooks/useActiveCallContext";
 import { useUserCallSettingsContext } from "../hooks/useUserCallSettings";
@@ -103,7 +104,9 @@ const Call = () => {
 
   return (
     <Stack horizontalAlign="center" verticalAlign="center">
-      <StackItem>Header</StackItem>
+      <StackItem>
+        <CallControls />
+      </StackItem>
       <StackItem>
         <Stack horizontal>
           <StackItem grow>
