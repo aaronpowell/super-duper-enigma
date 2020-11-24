@@ -56,8 +56,9 @@ export const ActiveCallContextProvider = (props: {
       removed: RemoteParticipant[];
     }) => {
       for (const participant of incomingRemoteParticipants.added) {
-        participant.on("videoStreamsUpdated", (x) => {
-          console.log("videoStreamsUpdate", x);
+        participant.on("videoStreamsUpdated", (event) => {
+          console.log("videoStreamsUpdate", event);
+          // setStreamsToRemove(event.removed);
         });
 
         participant.on("participantStateChanged", () => {

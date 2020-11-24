@@ -2,15 +2,6 @@ import {
   LocalVideoStream,
   RemoteVideoStream,
 } from "@azure/communication-calling";
-import {
-  CommunicationUser,
-  CallingApplication,
-  UnknownIdentifier,
-  PhoneNumber,
-  isCommunicationUser,
-  isCallingApplication,
-  isPhoneNumber,
-} from "@azure/communication-common";
 import { Stack, StackItem } from "@fluentui/react";
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
@@ -19,24 +10,7 @@ import VideoDisplay from "../components/VideoDisplay";
 import { useActiveCallContext } from "../hooks/useActiveCallContext";
 import { useUserCallSettingsContext } from "../hooks/useUserCallSettings";
 import { mediaGalleryGridStyle, mediaGalleryStyle } from "../styling";
-
-const getId = (
-  identifier:
-    | CommunicationUser
-    | CallingApplication
-    | UnknownIdentifier
-    | PhoneNumber
-): string => {
-  if (isCommunicationUser(identifier)) {
-    return identifier.communicationUserId;
-  } else if (isCallingApplication(identifier)) {
-    return identifier.callingApplicationId;
-  } else if (isPhoneNumber(identifier)) {
-    return identifier.phoneNumber;
-  } else {
-    return identifier.id;
-  }
-};
+import { getId } from "../utils";
 
 type VideoParticipant = {
   id: string;

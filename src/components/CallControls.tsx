@@ -24,7 +24,7 @@ const CallControls = () => {
           if (!checked) {
             for (const lvs of call.localVideoStreams) {
               if (lvs.getMediaStreamType() === "Video") {
-                call.stopVideo(lvs);
+                call.stopVideo(lvs);        
               }
             }
           } else if (currentCamera) {
