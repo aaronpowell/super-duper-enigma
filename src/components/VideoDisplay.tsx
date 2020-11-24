@@ -21,6 +21,7 @@ const RemoteVideoDisplay = (props: {
       setAvailable(true);
       const r = new Renderer(props.stream);
 
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       renderView = await r.createView({ scalingMode: "Crop" });
       if (vidRef.current) {
         vidRef.current.appendChild(renderView.target);
